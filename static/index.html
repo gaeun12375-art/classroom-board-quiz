@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#172d32" />
+  <meta name="description" content="교사와 학생이 QR코드로 함께 즐기는 실시간 형성평가 말판놀이" />
+  <title>한 칸의 발견 | 형성평가 말판놀이</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+<div id="toast" class="toast" aria-live="polite"></div>
+<header class="site-header">
+  <a class="brand" href="/" aria-label="홈으로">
+    <span class="brand-icon">✦</span>
+    <span><strong>한 칸의 발견</strong><small>배우고, 굴리고, 도착하다</small></span>
+  </a>
+  <div class="header-actions">
+    <span id="status-tag" class="status-tag" hidden>● 연결됨</span>
+    <button id="audio-unlock" class="btn btn-sm btn-ghost" type="button" title="효과음 재생 허용">♫ 소리 켜기</button>
+  </div>
+</header>
+<main id="app">
+  <section id="landing" class="page shell">
+    <div class="hero">
+      <div class="hero-left">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> PLAYFUL LEARNING TOOLKIT</div>
+        <h1>문제 하나,<br><em>말판 한 칸.</em></h1>
+        <p class="hero-desc">문제를 풀고, 주사위를 굴리고, 반전을 만나는 형성평가 말판놀이. 어떤 교과에도 쓸 수 있도록 문제를 직접 바꿀 수 있어요.</p>
+        <div class="hero-buttons"><button class="btn btn-primary btn-lg" id="new-game">새 게임 만들기 <span>↗</span></button><a href="#join-area" class="btn btn-outline btn-lg">게임방 입장</a></div>
+        <div class="hero-points"><span>✦ QR코드 참여</span><span>✦ 실시간 팀 대결</span><span>✦ 문제·규칙 설정</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="decor-ring ring-one"></div><div class="decor-ring ring-two"></div>
+        <div class="mock-dice dice-one"><span>⚄</span></div><div class="mock-dice dice-two"><span>⚂</span></div>
+        <div class="mock-board"><span>START</span><span>✳</span><span>?</span><span>↔</span><span>★</span><span>↗</span><span>◉</span><span>FINISH</span></div>
+        <div class="art-caption">TURN YOUR CLASS INTO A GAME</div>
+      </div>
+    </div>
+    <div class="landing-bottom" id="join-area"><div><span class="eyebrow dark">ALREADY HAVE A GAME?</span><h2>게임방 코드로 바로 입장</h2></div><form id="join-form" class="join-form"><label class="sr-only" for="join-code">게임방 코드</label><input id="join-code" placeholder="예: ABC123" maxlength="6" required autocomplete="off" /><button class="btn btn-dark" type="submit">입장하기 ↗</button></form></div>
+  </section>
+
+  <section id="builder" class="page shell" hidden>
+    <div class="section-top"><button class="back-link" id="back-home" type="button">← 처음으로</button><span class="eyebrow dark">SET UP YOUR GAME</span></div>
+    <div class="page-heading"><div><h1>우리 반의 말판 만들기</h1><p>문제와 팀을 설정하면 학생용 링크와 QR코드가 만들어져요.</p></div><span class="step-pill">STEP 01 / 설정</span></div>
+    <form id="create-form">
+      <div class="builder-grid">
+        <div class="builder-main">
+          <article class="panel setup-panel"><div class="panel-head"><span class="panel-icon">01</span><div><h2>게임 기본 설정</h2><p>문제 수에 따라 말판 길이가 자동으로 달라집니다.</p></div></div>
+            <div class="field-row three">
+              <label>기본 문제 수 <span class="help">5~48개</span><input id="set-count" type="number" min="5" max="48" value="8" required /></label>
+              <label>참가 팀 수 <span class="help">2~8팀</span><input id="set-teams" type="number" min="2" max="8" value="3" required /></label>
+              <label>오답 재입력 <span class="help">추가 기회</span><select id="set-retries"><option value="0">0회</option><option value="1" selected>1회</option><option value="2">2회</option><option value="3">3회</option></select></label>
+            </div>
+            <div class="note">힌트는 <b>팀당 게임 전체 5회</b>로 고정됩니다. 주사위의 뺄셈은 두 눈의 차의 절댓값이며, 0이 나오면 제자리에서 문제를 풉니다.</div>
+            <h3 class="subheading">팀 이름</h3><div id="team-inputs" class="team-inputs"></div>
+          </article>
+          <article class="panel setup-panel"><div class="panel-head"><span class="panel-icon">02</span><div><h2>기본 문제 입력</h2><p>직접 입력하거나 예시 문제를 불러온 뒤 수정할 수 있어요.</p></div></div>
+            <div class="between"><span class="muted" id="questions-count-text">총 8문항</span><button type="button" id="load-example" class="btn btn-sm btn-outline">✦ 예시 문제 불러오기</button></div>
+            <div id="question-list" class="question-list"></div>
+          </article>
+          <article class="panel setup-panel"><div class="panel-head"><span class="panel-icon">03</span><div><h2>특별 퀴즈 카드</h2><p>정답은 학생이 구두로 말하고, 교사가 직접 정답/오답을 판정해요.</p></div></div>
+            <div class="between"><span class="muted">함정·포털 칸 외에 자유롭게 배치</span><button type="button" id="add-special" class="btn btn-sm btn-outline">+ 카드 추가</button></div>
+            <div id="special-list" class="special-list"></div>
+            <p class="note mini" id="reserved-info"></p>
+          </article>
+          <article class="panel setup-panel"><div class="panel-head"><span class="panel-icon">04</span><div><h2>효과음 설정</h2><p>다섯 가지 상황마다 다른 효과음이 재생돼요. 나중에 교사용 화면에서도 변경할 수 있습니다.</p></div></div><div id="sound-options" class="sound-options"></div><div class="volume-row"><label for="sound-volume">기본 음량</label><input type="range" id="sound-volume" min="0" max="100" value="40" /><output id="sound-volume-value">40%</output></div>
+          </article>
+        </div>
+        <aside class="builder-aside"><div class="sticky-panel"><div class="aside-label">YOUR BOARD</div><h3>말판 미리 설정</h3><p class="muted">게임 시작 전에 적용될 특별 칸의 위치예요.</p><div id="board-rule-preview" class="rule-preview"></div><div class="legend"><span><i class="legend-dot reset"></i> 처음으로</span><span><i class="legend-dot swap"></i> 선두 교환</span><span><i class="legend-dot portal"></i> 포털 A·B</span><span><i class="legend-dot special"></i> 특별 퀴즈</span></div><button class="btn btn-primary btn-full btn-lg" type="submit" id="create-btn">게임방 만들기 ↗</button><p class="fineprint">방을 만들면 교사용 비밀 링크와 팀별 참가 코드를 받습니다.</p></div></aside>
+      </div>
+    </form>
+  </section>
+
+  <section id="game" class="page game-shell" hidden>
+    <div class="game-topline"><div><span class="eyebrow dark">LIVE CLASSROOM GAME</span><h1>우리 반의 <em>한 칸</em></h1><div class="game-sub">게임방 <strong id="room-code-label">------</strong> <span class="dot-separator">·</span> <span id="turn-label">대기 중</span></div></div><div class="game-top-buttons"><span id="mode-chip" class="mode-chip">관전 화면</span><button id="home-btn" class="btn btn-outline btn-sm">⌂ 홈</button></div></div>
+    <div id="teacher-tools" class="teacher-tools panel" hidden>
+      <div class="between tools-title"><div><span class="eyebrow dark">TEACHER CONTROL ROOM</span><h2>교사용 관리실 <span class="secret-tag">비공개</span></h2></div><div class="tool-actions"><button id="start-game" class="btn btn-primary" type="button">▶ 게임 시작</button><button id="skip-turn" class="btn btn-outline" type="button" hidden>차례 건너뛰기</button><button id="clone-game" class="btn btn-outline" type="button">＋ 다른 반에 재사용</button><button id="restart-game" class="btn btn-ghost" type="button">↻ 현재 게임 초기화</button></div></div>
+      <p class="reuse-guide"><strong>다른 반에 재사용</strong>하면 문제·힌트·특별카드·규칙은 그대로 복사하고, 새로운 게임방 주소와 팀별 참가 코드가 만들어집니다. <strong>현재 게임 초기화</strong>는 지금 방의 말 위치·힌트 사용·문제 진행·활동 기록을 지우고 처음부터 다시 시작합니다.</p>
+      <div class="teacher-tools-inner"><div class="teacher-invite"><div class="teacher-invite-title"><strong>학생용 입장 링크</strong><span>팀 선택 후 참가 코드 입력</span></div><div class="share-control"><input id="student-url" readonly aria-label="학생용 주소" /><button id="copy-student" class="btn btn-dark btn-sm">주소 복사</button></div><div class="share-control"><input id="display-url" readonly aria-label="전광판 주소" /><button id="copy-display" class="btn btn-outline btn-sm">전광판 복사</button></div><p class="fineprint">전광판은 읽기 전용입니다. 정답이나 교사용 참가 코드가 노출되지 않아요.</p></div><div class="qr-container"><img id="qr-image" alt="학생용 게임방 QR코드"/><span>학생용 QR코드</span></div><div class="teacher-codes"><strong>팀별 참가 코드 <span class="lock">🔒</span></strong><div id="pin-list" class="pin-list"></div></div></div>
+      <details class="teacher-settings"><summary>♫ 효과음 관리 <span>상황별 켜기·끄기와 음량 조절</span></summary><div id="live-sound-options" class="sound-options"></div><div class="volume-row"><label for="live-volume">효과음 음량</label><input type="range" id="live-volume" min="0" max="100" value="40"/><output id="live-volume-value">40%</output><button id="save-sounds" class="btn btn-sm btn-dark">저장</button></div></details>
+    </div>
+    <div class="game-layout">
+      <div class="board-area panel"><div class="board-title between"><div><span class="eyebrow dark">THE GAME BOARD</span><h2>출발에서 도착까지</h2></div><div class="board-numbers"><span id="board-goal">0칸</span><span>🏁 FINISH</span></div></div><div class="board-scroll"><div id="board" class="board" role="group" aria-label="말판"></div></div><div class="board-key"><span>🌀 포털</span><span>↩ 처음으로</span><span>↔ 선두 교환</span><span>★ 특별 퀴즈</span></div></div>
+      <div class="game-sidebar"><div id="join-team-panel" class="panel side-panel" hidden><div class="eyebrow dark">JOIN A TEAM</div><h2>우리 팀 입장하기</h2><p class="muted">선생님이 알려준 참가 코드를 입력해 주세요.</p><form id="team-join-form"><label>팀 선택<select id="choose-team"></select></label><label>팀 참가 코드<input id="team-pin" maxlength="6" inputmode="numeric" placeholder="6자리 코드" required /></label><button type="submit" class="btn btn-primary btn-full">우리 팀으로 참여 →</button></form><button id="watch-only" type="button" class="text-button">참가하지 않고 보기</button></div>
+      <div id="active-team-panel" class="panel side-panel"><div class="turn-top"><span class="eyebrow dark">ON THE MOVE</span><span id="round-number" class="round-chip">TURN 01</span></div><div class="team-turn-title"><div id="team-color-icon" class="team-color-icon">1</div><div><small>지금 차례</small><h2 id="active-team-name">대기 중</h2></div></div><div id="turn-status" class="turn-status">선생님이 시작하면 진행됩니다.</div><div id="dice-panel" class="dice-panel" hidden><div class="dice-big"><span id="die-a">⚀</span><span id="die-b">⚀</span></div><div class="dice-equation" id="dice-equation">1 + 1 = 2</div></div><div id="question-panel" class="question-panel" hidden></div><div id="special-panel" class="special-panel" hidden></div><button id="roll-button" class="btn btn-primary btn-full btn-lg" hidden>🎲 주사위 굴리기</button><div id="locked-note" class="locked-note" hidden><span>🔒</span> 다른 팀의 차례입니다. 우리 팀 차례에만 답을 입력할 수 있어요.</div></div>
+      <div class="panel side-panel rankings-panel"><div class="between"><h2>팀별 현황</h2><span class="muted">힌트 5회 / 팀</span></div><div id="rankings" class="rankings"></div></div>
+      <div class="panel side-panel history-panel"><h2>게임 기록</h2><div id="history-list" class="history-list"></div></div></div>
+    </div>
+    <footer class="game-footer">한 칸의 발견 <span>·</span> 교과를 가리지 않는 형성평가 놀이터</footer>
+  </section>
+</main>
+<script src="/static/app.js" defer></script>
+</body>
+</html>
